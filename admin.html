@@ -1,0 +1,957 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#111318">
+  <title>ShopFlowBrasil • Administração</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg: #111318;
+      --bg2: #1a1d23;
+      --bg3: #22262e;
+      --card: #1a1d23;
+      --border: #2a2e37;
+      --text: #f1f5f9;
+      --text2: #94a3b8;
+      --text3: #64748b;
+      --accent: #ff4757;
+      --accent2: #ee4d2d;
+      --green: #2ecc71;
+      --yellow: #f39c12;
+      --radius: 18px;
+      --radius-sm: 12px;
+      --shadow: 0 8px 32px rgba(0,0,0,0.3);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, textarea, select {
+      outline: none !important;
+      -webkit-appearance: none;
+      appearance: none;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    button:focus-visible, input:focus-visible, textarea:focus-visible {
+      box-shadow: 0 0 0 3px rgba(255, 71, 87, 0.3);
+      border-radius: 8px;
+    }
+
+    /* HEADER */
+    .admin-header {
+      background: rgba(17, 19, 24, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .admin-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-mark {
+      background: var(--accent);
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .logo .plus { color: var(--accent); }
+
+    .admin-head > div:last-child {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .status {
+      font-size: 12px;
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .view {
+      color: var(--text2);
+      text-decoration: none;
+      font-size: 13px;
+      transition: var(--transition);
+    }
+
+    .view:hover { color: var(--text); }
+
+    .btn-logout {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text2);
+      padding: 8px 16px;
+      border-radius: 40px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .btn-logout:hover {
+      background: var(--bg3);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* DASHBOARD */
+    .dashboard {
+      padding-top: 32px;
+      padding-bottom: 60px;
+    }
+
+    .welcome {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 6px;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .welcome h1 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .welcome p {
+      color: var(--text2);
+      font-size: 15px;
+      margin-top: 4px;
+    }
+
+    .new {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .new:hover {
+      background: var(--accent2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(255, 71, 87, 0.3);
+    }
+
+    /* STATS */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .stats > div {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: var(--transition);
+    }
+
+    .stats > div:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow);
+      border-color: var(--text3);
+    }
+
+    .stats span {
+      font-size: 28px;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .stats small {
+      color: var(--text2);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .stats b {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent);
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    /* GRID */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .panel-title h2 {
+      font-size: 20px;
+      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .circle {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text2);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      transition: var(--transition);
+    }
+
+    .circle:hover {
+      background: var(--bg3);
+      color: var(--text);
+    }
+
+    /* FORM */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text2);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 14px;
+      transition: var(--transition);
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(255, 71, 87, 0.1);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .image-preview {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+      padding: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+
+    .image-preview img {
+      width: 80px;
+      height: 80px;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+
+    .image-preview b {
+      display: block;
+      font-size: 14px;
+    }
+
+    .image-preview small {
+      color: var(--text2);
+      font-size: 12px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .save {
+      flex: 1;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .save:hover {
+      background: var(--accent2);
+      transform: translateY(-2px);
+    }
+
+    .clear {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text2);
+      padding: 14px 20px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 14px;
+      transition: var(--transition);
+    }
+
+    .clear:hover {
+      background: var(--bg3);
+      color: var(--text);
+    }
+
+    /* CATÁLOGO */
+    .counter {
+      background: var(--accent);
+      color: #fff;
+      padding: 4px 12px;
+      border-radius: 40px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .admin-search {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 40px;
+      padding: 10px 16px;
+      font-size: 18px;
+      color: var(--text3);
+    }
+
+    .admin-search input {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .admin-search input::placeholder { color: var(--text3); }
+
+    #adminSort {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 16px;
+      border-radius: 40px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    #adminList {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .admin-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+
+    .admin-item:hover {
+      border-color: var(--text3);
+    }
+
+    .admin-item img {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .admin-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .admin-item-info b {
+      display: block;
+      font-size: 14px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .admin-item-info small {
+      color: var(--text2);
+      font-size: 12px;
+    }
+
+    .admin-item-price {
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .btn-edit {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .btn-edit:hover { background: var(--accent2); }
+
+    .btn-delete {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .btn-delete:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 40px;
+      color: var(--text3);
+      font-size: 14px;
+    }
+
+    /* TIPS */
+    .admin-tips {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 14px;
+    }
+
+    .admin-tips > div {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 18px;
+    }
+
+    .admin-tips b {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .admin-tips p {
+      color: var(--text2);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    /* TOAST */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast {
+      padding: 16px 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 500;
+      min-width: 280px;
+      box-shadow: var(--shadow);
+      animation: toastIn 0.4s ease;
+    }
+
+    .toast-success { border-left: 4px solid var(--green); }
+    .toast-error { border-left: 4px solid var(--accent); }
+
+    @keyframes toastIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* RESPONSIVO */
+    @media (max-width: 900px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .welcome h1 { font-size: 24px; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .form-row { grid-template-columns: 1fr; }
+      .admin-head { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <header class="admin-header">
+    <div class="wrap admin-head">
+      <a class="logo" href="index.html">
+        <span class="logo-mark">+</span>
+        <span>ShopFlow<span class="plus">Brasil</span></span>
+      </a>
+      <div>
+        <span class="status">● Sistema online</span>
+        <span id="adminUser" style="font-size:13px; color:var(--text2); margin-right:12px;">...</span>
+        <button class="btn-logout" onclick="sair()">Sair</button>
+        <a class="view" href="index.html">Ver vitrine ↗</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap dashboard">
+    <section class="welcome">
+      <div>
+        <span class="eyebrow">PAINEL ADMINISTRATIVO</span>
+        <h1>Controle sua vitrine.</h1>
+        <p>Adicione, edite e organize todos os produtos.</p>
+      </div>
+      <button class="new" id="newProduct" onclick="novoProduto()">＋ Novo produto</button>
+    </section>
+
+    <section class="stats">
+      <div><span>📦</span><small>Produtos</small><b id="sProducts">0</b></div>
+      <div><span>🔥</span><small>Ofertas</small><b id="sDeals">0</b></div>
+      <div><span>⭐</span><small>Nota média</small><b id="sRating">0,0</b></div>
+      <div><span>💰</span><small>Preço médio</small><b id="sAverage">R$ 0,00</b></div>
+    </section>
+
+    <section class="dashboard-grid">
+      <div class="panel editor">
+        <div class="panel-title">
+          <div><span class="eyebrow">PRODUTO</span><h2 id="formTitle">Novo produto</h2></div>
+          <button class="circle" id="cancel" onclick="limparFormulario()">×</button>
+        </div>
+
+        <form id="form" onsubmit="salvarProduto(event)">
+          <input type="hidden" id="id">
+          
+          <div class="image-preview">
+            <img id="preview" src="https://placehold.co/900x700?text=Preview" alt="Preview">
+            <div><b>Imagem principal</b><small>Cole uma URL pública da imagem.</small></div>
+          </div>
+          
+          <div class="form-group">
+            <label>URL da imagem</label>
+            <input id="image" type="url" placeholder="https://..." oninput="document.getElementById('preview').src=this.value">
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nome do produto</label>
+              <input id="name" required placeholder="Ex.: Fone Bluetooth Pro">
+            </div>
+            <div class="form-group">
+              <label>Categoria</label>
+              <input id="category" required placeholder="Ex.: Eletrônicos">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Preço atual</label>
+              <input id="price" type="number" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+              <label>Preço anterior</label>
+              <input id="oldPrice" type="number" step="0.01" min="0" placeholder="Opcional">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Avaliação</label>
+              <input id="rating" type="number" step="0.1" min="0" max="5" value="4.8">
+            </div>
+            <div class="form-group">
+              <label>Etiqueta</label>
+              <input id="badge" placeholder="OFERTA / NOVO / DESTAQUE">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Descrição</label>
+            <textarea id="description" placeholder="Descrição completa do produto..."></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label>Link de afiliado</label>
+            <input id="affiliate" type="url" placeholder="https://seu-link-de-afiliado...">
+          </div>
+          
+          <div class="form-actions">
+            <button class="save" type="submit">Salvar produto</button>
+            <button class="clear" type="button" onclick="limparFormulario()">Limpar</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="panel catalog-admin">
+        <div class="panel-title">
+          <div><span class="eyebrow">GERENCIAMENTO</span><h2>Seu catálogo</h2></div>
+          <b class="counter" id="count">0</b>
+        </div>
+        <div class="toolbar">
+          <div class="admin-search">⌕<input id="adminSearch" placeholder="Pesquisar produto..." oninput="filtrarProdutos()"></div>
+          <select id="adminSort" onchange="ordenarProdutos()">
+            <option value="new">Mais recentes</option>
+            <option value="priceAsc">Menor preço</option>
+            <option value="priceDesc">Maior preço</option>
+            <option value="name">Nome</option>
+          </select>
+        </div>
+        <div id="adminList"></div>
+      </div>
+    </section>
+
+    <section class="admin-tips">
+      <div><b>💡 Dica</b><p>Use imagens horizontais ou quadradas de boa qualidade para melhorar os cards.</p></div>
+      <div><b>🔗 Afiliado</b><p>Coloque o link de rastreamento fornecido pela plataforma de afiliados no campo correspondente.</p></div>
+      <div><b>🚀 Produção</b><p>Os produtos são salvos no Supabase e aparecem na vitrine em tempo real.</p></div>
+    </section>
+  </main>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    // Verificar login
+    if (localStorage.getItem("admin_logado") !== "sim") {
+      window.location.href = "login-admin.html";
+    } else {
+      document.getElementById("adminUser").textContent = localStorage.getItem("admin_usuario") || "Admin";
+    }
+
+    // Supabase
+    const SUPABASE_URL = 'https://ivqdpboongejivasrwqpb.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml2cWRwYm9vbmdlaml2YXNyd3FwYiIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzM0NzY5NDAwLCJleHAiOjIwNTAzNDU0MDB9.SUa7E0CSSfRAe1nK0EOvNYG-G7ZC4a8yQOEXdTSCJe0';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let produtos = [];
+    let produtosFiltrados = [];
+    let editandoId = null;
+
+    function mostrarToast(msg, tipo) {
+      const container = document.getElementById("toastContainer");
+      const toast = document.createElement("div");
+      toast.className = "toast toast-" + (tipo || "success");
+      toast.textContent = msg;
+      container.appendChild(toast);
+      setTimeout(function() { toast.remove(); }, 3000);
+    }
+
+    function sair() {
+      localStorage.removeItem("admin_logado");
+      localStorage.removeItem("admin_usuario");
+      window.location.href = "login-admin.html";
+    }
+
+    function formatarPreco(p) {
+      return "R$ " + Number(p || 0).toFixed(2).replace(".", ",");
+    }
+
+    async function carregarProdutos() {
+      try {
+        const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
+        if (error) throw error;
+        produtos = data || [];
+        produtosFiltrados = [...produtos];
+      } catch(e) {
+        console.error(e);
+        produtos = [];
+        produtosFiltrados = [];
+      }
+      renderizarLista();
+      atualizarStats();
+    }
+
+    function atualizarStats() {
+      document.getElementById("sProducts").textContent = produtos.length;
+      document.getElementById("sDeals").textContent = produtos.filter(p => p.is_promo).length;
+      const ratings = produtos.filter(p => p.rating).map(p => Number(p.rating));
+      document.getElementById("sRating").textContent = ratings.length ? (ratings.reduce((a,b) => a+b, 0) / ratings.length).toFixed(1) : "0,0";
+      const precos = produtos.map(p => Number(p.price));
+      document.getElementById("sAverage").textContent = precos.length ? formatarPreco(precos.reduce((a,b) => a+b, 0) / precos.length) : "R$ 0,00";
+      document.getElementById("count").textContent = produtos.length;
+    }
+
+    function renderizarLista() {
+      const lista = document.getElementById("adminList");
+      if (produtosFiltrados.length === 0) {
+        lista.innerHTML = '<div class="empty">Nenhum produto cadastrado.</div>';
+        return;
+      }
+      lista.innerHTML = produtosFiltrados.map(function(p) {
+        const img = p.images && p.images.length > 0 ? p.images[0] : (p.image || "https://placehold.co/50x50?text=📦");
+        return '<div class="admin-item">' +
+          '<img src="' + img + '" alt="' + p.name + '" onerror="this.src=\'https://placehold.co/50x50?text=📦\'">' +
+          '<div class="admin-item-info">' +
+            '<b>' + p.name + (p.is_promo ? ' 🔥' : '') + '</b>' +
+            '<small>' + (p.category || "Sem categoria") + '</small>' +
+          '</div>' +
+          '<div class="admin-item-price">' + formatarPreco(p.price) + '</div>' +
+          '<button class="btn-edit" onclick="editarProduto(\'' + p.id + '\')">Editar</button>' +
+          '<button class="btn-delete" onclick="excluirProduto(\'' + p.id + '\')">Excluir</button>' +
+        '</div>';
+      }).join("");
+    }
+
+    function filtrarProdutos() {
+      const busca = document.getElementById("adminSearch").value.toLowerCase();
+      produtosFiltrados = produtos.filter(function(p) {
+        return (p.name || "").toLowerCase().includes(busca) ||
+               (p.category || "").toLowerCase().includes(busca);
+      });
+      renderizarLista();
+    }
+
+    function ordenarProdutos() {
+      const tipo = document.getElementById("adminSort").value;
+      if (tipo === "priceAsc") produtosFiltrados.sort((a,b) => a.price - b.price);
+      else if (tipo === "priceDesc") produtosFiltrados.sort((a,b) => b.price - a.price);
+      else if (tipo === "name") produtosFiltrados.sort((a,b) => (a.name || "").localeCompare(b.name || ""));
+      else produtosFiltrados.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+      renderizarLista();
+    }
+
+    function novoProduto() {
+      editandoId = null;
+      document.getElementById("formTitle").textContent = "Novo produto";
+      limparFormulario();
+    }
+
+    function limparFormulario() {
+      document.getElementById("id").value = "";
+      document.getElementById("image").value = "";
+      document.getElementById("name").value = "";
+      document.getElementById("category").value = "";
+      document.getElementById("price").value = "";
+      document.getElementById("oldPrice").value = "";
+      document.getElementById("rating").value = "4.8";
+      document.getElementById("badge").value = "";
+      document.getElementById("description").value = "";
+      document.getElementById("affiliate").value = "";
+      document.getElementById("preview").src = "https://placehold.co/900x700?text=Preview";
+      editandoId = null;
+    }
+
+    function editarProduto(id) {
+      const p = produtos.find(function(x) { return x.id === id; });
+      if (!p) return;
+      editandoId = id;
+      document.getElementById("formTitle").textContent = "Editar produto";
+      document.getElementById("id").value = p.id;
+      document.getElementById("image").value = p.images && p.images.length > 0 ? p.images[0] : "";
+      document.getElementById("preview").src = p.images && p.images.length > 0 ? p.images[0] : "https://placehold.co/900x700?text=Preview";
+      document.getElementById("name").value = p.name || "";
+      document.getElementById("category").value = p.category || "";
+      document.getElementById("price").value = p.price || "";
+      document.getElementById("oldPrice").value = p.old_price || "";
+      document.getElementById("rating").value = p.rating || "4.8";
+      document.getElementById("badge").value = p.badge || "";
+      document.getElementById("description").value = p.description || "";
+      document.getElementById("affiliate").value = p.product_url || "";
+    }
+
+    async function salvarProduto(event) {
+      event.preventDefault();
+      
+      const nome = document.getElementById("name").value.trim();
+      const preco = parseFloat(document.getElementById("price").value);
+      const imagem = document.getElementById("image").value.trim();
+
+      if (!nome) { mostrarToast("Digite o nome do produto!", "error"); return; }
+      if (!preco || preco <= 0) { mostrarToast("Digite um preço válido!", "error"); return; }
+
+      const dados = {
+        name: nome,
+        price: preco,
+        old_price: document.getElementById("oldPrice").value ? parseFloat(document.getElementById("oldPrice").value) : null,
+        category: document.getElementById("category").value.trim(),
+        rating: document.getElementById("rating").value ? parseFloat(document.getElementById("rating").value) : null,
+        description: document.getElementById("description").value.trim(),
+        product_url: document.getElementById("affiliate").value.trim(),
+        is_promo: document.getElementById("badge").value.toUpperCase().includes("OFERTA"),
+        active: true,
+        images: imagem ? [imagem] : []
+      };
+
+      try {
+        if (editandoId) {
+          const { error } = await supabase.from("products").update(dados).eq("id", editandoId);
+          if (error) throw error;
+          mostrarToast("✅ Produto atualizado!", "success");
+        } else {
+          const { error } = await supabase.from("products").insert([dados]);
+          if (error) throw error;
+          mostrarToast("✅ Produto adicionado!", "success");
+        }
+        limparFormulario();
+        carregarProdutos();
+      } catch(e) {
+        console.error(e);
+        mostrarToast("❌ Erro ao salvar: " + e.message, "error");
+      }
+    }
+
+    async function excluirProduto(id) {
+      if (!confirm("Excluir este produto?")) return;
+      try {
+        const { error } = await supabase.from("products").delete().eq("id", id);
+        if (error) throw error;
+        mostrarToast("✅ Produto excluído!", "success");
+        carregarProdutos();
+      } catch(e) {
+        console.error(e);
+        mostrarToast("❌ Erro ao excluir.", "error");
+      }
+    }
+
+    // Realtime
+    supabase.channel("admin-realtime").on("postgres_changes", { event: "*", schema: "public", table: "products" }, function() {
+      carregarProdutos();
+    }).subscribe();
+
+    // Iniciar
+    carregarProdutos();
+  </script>
+</body>
+</html>

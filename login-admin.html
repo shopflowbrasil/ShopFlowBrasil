@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Admin - ShopFlowBrasil</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        
+        .container {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 40px;
+            width: 100%;
+            max-width: 380px;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo-icon {
+            font-size: 50px;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .logo-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        .logo-highlight {
+            color: #ff4757;
+        }
+        
+        h1 {
+            color: #fff;
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: #888;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .message {
+            display: none;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .message.error {
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid #ff4757;
+            color: #ff4757;
+        }
+        
+        .message.success {
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid #2ecc71;
+            color: #2ecc71;
+        }
+        
+        .message.show {
+            display: block;
+        }
+        
+        .field {
+            margin-bottom: 18px;
+        }
+        
+        label {
+            display: block;
+            color: #aaa;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 13px 15px;
+            background: #222;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            border-color: #ff4757;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: #ff4757;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #e03040;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .back-link:hover {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <span class="logo-icon">🛍️</span>
+            <span class="logo-text">shopflow<span class="logo-highlight">brasil</span></span>
+        </div>
+        
+        <h1>Painel Administrativo</h1>
+        <p class="subtitle">Faça login para continuar</p>
+        
+        <div class="message" id="msgError"></div>
+        <div class="message" id="msgSuccess"></div>
+        
+        <div class="field">
+            <label for="txtUser">Usuário</label>
+            <input type="text" id="txtUser" placeholder="Digite seu usuário" autocomplete="off">
+        </div>
+        
+        <div class="field">
+            <label for="txtPass">Senha</label>
+            <input type="password" id="txtPass" placeholder="Digite sua senha">
+        </div>
+        
+        <button class="btn" id="btnLogin" onclick="login()">Entrar</button>
+        
+        <a href="index.html" class="back-link">← Voltar para o site</a>
+    </div>
+    
+    <script>
+        // Credenciais corretas
+        var USER_CORRETO = "soypedro148";
+        var SENHA_CORRETA = "Soy_Pedro8";
+        
+        function login() {
+            var user = document.getElementById("txtUser").value.trim();
+            var pass = document.getElementById("txtPass").value;
+            
+            var msgError = document.getElementById("msgError");
+            var msgSuccess = document.getElementById("msgSuccess");
+            
+            // Limpar mensagens
+            msgError.classList.remove("show");
+            msgSuccess.classList.remove("show");
+            
+            console.log("Tentando login...");
+            console.log("Usuário digitado:", user);
+            console.log("Senha digitada:", pass ? "****" : "vazia");
+            
+            // Verificar se campos estão vazios
+            if (user === "") {
+                msgError.textContent = "Digite o usuário!";
+                msgError.classList.add("show");
+                return;
+            }
+            
+            if (pass === "") {
+                msgError.textContent = "Digite a senha!";
+                msgError.classList.add("show");
+                return;
+            }
+            
+            // Verificar credenciais
+            if (user === USER_CORRETO && pass === SENHA_CORRETA) {
+                console.log("✅ LOGIN CORRETO!");
+                
+                // Salvar no localStorage
+                localStorage.setItem("admin_logado", "sim");
+                localStorage.setItem("admin_usuario", user);
+                localStorage.setItem("admin_data", new Date().toISOString());
+                
+                // Mostrar sucesso
+                msgSuccess.textContent = "✅ Login realizado! Entrando...";
+                msgSuccess.classList.add("show");
+                
+                // Desabilitar botão
+                document.getElementById("btnLogin").textContent = "Entrando...";
+                document.getElementById("btnLogin").disabled = true;
+                
+                // Redirecionar após 1 segundo
+                setTimeout(function() {
+                    window.location.href = "admin.html";
+                }, 1000);
+                
+            } else {
+                console.log("❌ Login incorreto");
+                msgError.textContent = "Usuário ou senha incorretos!";
+                msgError.classList.add("show");
+                
+                // Limpar campos
+                document.getElementById("txtPass").value = "";
+                document.getElementById("txtPass").focus();
+            }
+        }
+        
+        // Permitir Enter
+        document.getElementById("txtPass").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                login();
+            }
+        });
+        
+        document.getElementById("txtUser").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                document.getElementById("txtPass").focus();
+            }
+        });
+        
+        // Focar no usuário
+        document.getElementById("txtUser").focus();
+        
+        // Verificar se já está logado
+        if (localStorage.getItem("admin_logado") === "sim") {
+            console.log("Já está logado! Redirecionando...");
+            window.location.href = "admin.html";
+        }
+    </script>
+</body>
+</html>
